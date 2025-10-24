@@ -42,14 +42,19 @@ export class TeacherTableComponent implements OnInit {
     })
   }
 
-  getTeacherData() {
-    this.selected = 'Teachers';
-    this.service.getTeacherData().subscribe((response) => {
-      this.teacherData = Object.keys(response).map((key) => [response[key]]);
-    }, (error) => {
-      console.log('ERROR - ', error)
-    })
-  }
+ getTeacherData() {
+  this.selected = 'Teachers';
+  this.service.getTeacherData().subscribe(
+    (response) => {
+      // Convert object to array directly, flattening nested arrays
+      this.teacherData = Object.values(response);
+    },
+    (error) => {
+      console.log('ERROR - ', error);
+    }
+  );
+}
+
 
   getStudentData() {
     this.selected = 'Students';
@@ -60,19 +65,22 @@ export class TeacherTableComponent implements OnInit {
     })
   }
 
-  search(value) {
-    let foundItems = [];
-    if (value.length <= 0) {
-      this.getTeacherData();
-    } else {
-      let b = this.teacherData.filter((teacher) => {
-        if (teacher[0].name.toLowerCase().indexOf(value) > -1) {
-          foundItems.push(teacher)
-        }
-      });
-      this.teacherData = foundItems;
-    }
+search(value: string) {
+  const searchTerm = value.toLowerCase().trim();
+
+  if (!searchTerm) {
+    // If search box is empty → reload all teachers
+    this.getTeacherData();
+    return;
   }
+
+  // Filter teacherData based on name or subject
+  this.teacherData = this.teacherData.filter((teacher: any) =>
+    teacher.name.toLowerCase().includes(searchTerm) ||
+    (teacher.subject && teacher.subject.toLowerCase().includes(searchTerm))
+  );
+}
+
 
   deleteTeacher(itemid) {
     const test = {

@@ -11,7 +11,7 @@ export class AppServiceService {
 
   constructor(private http: HttpClient) {
     if(environment.production == false){
-      this.ROOT_URL = 'http://localhost:4200'
+      this.ROOT_URL = 'http://localhost:8080'
     }else{
       this.ROOT_URL = 'api'
     }
@@ -26,11 +26,11 @@ export class AppServiceService {
   }
 
   getStudentData(){
-    return this.http.get(`/${this.ROOT_URL}/listStudents`)
+    return this.http.get('/api/Students')
   }
 
   getOneStudentData(payload: Object){
-    return this.http.post(`/${this.ROOT_URL}/getStudentInfo`, payload)
+    return this.http.post('/api/getStudentInfo', payload)
   }
 
   getOneTeacherData(payload: Object){
@@ -54,10 +54,10 @@ export class AppServiceService {
   }
 
   addStudent(payload: Object){
-    return this.http.post(`/${this.ROOT_URL}/addStudent`, payload)
+    return this.http.post('/api/addStudent', payload)
   }
 
   deleteStudent(payload: Object){
-    return this.http.post(`/${this.ROOT_URL}/deleteStudent`, payload)
+    return this.http.post('/api/deleteStudent', payload)
   }
 }
