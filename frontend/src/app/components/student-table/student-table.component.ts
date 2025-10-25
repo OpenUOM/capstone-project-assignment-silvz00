@@ -12,9 +12,8 @@ export class StudentTableComponent implements OnInit {
   faTrash = faTrash;
   faPlus = faPlus;
   faPenSquare = faPenSquare;
-  
-  studentData: any[] = [];
-  allStudents: any[] = [];
+  studentData: any;
+  selected: any;
 
   constructor(private service : AppServiceService, private router: Router) { }
 
@@ -26,7 +25,7 @@ export class StudentTableComponent implements OnInit {
     this.router.navigate(['addStudent'])
   }
 
-  editStudent(id : number){
+  editStudent(id){
     const navigationExtras: NavigationExtras = {
       state: {
         id : id
@@ -35,20 +34,15 @@ export class StudentTableComponent implements OnInit {
     this.router.navigate(['editStudent'], navigationExtras )
   }
 
-  getStudentData() {
-    this.service.getStudentData().subscribe(
-      (response) => {
-        // Flatten nested arrays
-        this.studentData = Object.values(response);
-        this.allStudents = [...this.studentData]; // store full copy for search
-      },
-      (error) => {
-        console.log('ERROR - ', error);
-      }
-    );
+  getStudentData(){
+    this.service.getStudentData().subscribe((response)=>{
+      this.studentData = Object.keys(response).map((key) => [response[key]]);
+    },(error)=>{
+      console.log('ERROR - ', error)
+    })
   }
 
-  deleteStudent(itemid : number){
+  deleteStudent(itemid){
     const student = {
       id: itemid
     }
@@ -57,19 +51,17 @@ export class StudentTableComponent implements OnInit {
     })
   }
 
-  search(value: string) {
-    const term = value.toLowerCase().trim();
-
-    if (!term) {
-      this.studentData = [...this.allStudents];
-      return;
+  search(value) {
+    let foundItems = [];
+    if (value.length <= 0) {
+      this.getStudentData();
+    } else {
+      let b = this.studentData.filter((student) => {
+        if (student[0].name.toLowerCase().indexOf(value) > -1) {
+          foundItems.push(student)
+        }
+      });
+      this.studentData = foundItems;
     }
-
-    this.studentData = this.allStudents.filter((student: any) =>
-      student.name.toLowerCase().includes(term) ||
-      student.hometown.toLowerCase().includes(term) ||
-      student.age.toString().includes(term)
-    );
   }
-
 }
